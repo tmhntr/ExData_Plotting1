@@ -1,0 +1,42 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Assignment 2 Script
+
+## First download and extract data
+
+In this case the data is delivered in a zip format, so we will save the archive to a temporary file.
+
+```{r}
+temp <- tempfile()
+fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip"
+download.file(fileUrl, temp, method="curl")
+```
+
+Display the first 10 lines of the file to see how it should be loaded.
+
+```{r}
+con <- file(unzip(temp, "household_power_consumption.txt"),"r")
+readLines(con,n=10)
+close(con)
+```
+
+Now we know the table has ";" as a delim.
+
+```{r}
+consumption <- read.table(unzip(temp, "household_power_consumption.txt"), header=TRUE, sep=";", na.strings="?")
+head(consumption)
+```
+
+The data is now loaded into a dataframe.
+
+### Convert Date/Time columns to R Date and Time classes
+
+```{r}
+library(dplyr)
+
+consumption %>% mutate(Date=as.Date(Date), Time=strptime(Time,"%H:%M:%S"))
+head(consumption)
+```
